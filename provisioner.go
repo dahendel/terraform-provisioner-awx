@@ -56,28 +56,27 @@ func applyFn(ctx context.Context) error {
 	var jobStatus string
 	jobStatus = checkJobStatus(jb, jl.ID)
 
-	var counter int
-	counter = 1
-
-	for jobStatus != "failed" ||  jobStatus != "successful" || jobStatus != "error" || jobStatus != "canceled" {
-		if jobStatus == "pending" {
-			fmt.Printf("Job %d is pending\n", jl.ID)
-		}
-
-		for jobStatus == "running" {
-			printEvents(jb, counter, jl.ID)
-			jobStatus = checkJobStatus(jb, jl.ID)
-			if jobStatus != "running" {
-				return fmt.Errorf("Job %d %s consult ansible tower for more details", jl.ID, jobStatus)
-			}
-
-			counter = counter + 1
-		}
-
+	for jobStatus == "pending" {
+		fmt.Printf("Job %d is pending\n", jl.ID)
 		jobStatus = checkJobStatus(jb, jl.ID)
 		time.Sleep(5 * time.Second)
 	}
 
+	var counter int
+	counter = 1
+
+	for jobStatus == "running" {
+		printEvents(jb, counter, jl.ID, o)
+		jobStatus = checkJobStatus(jb, jl.ID)
+		// Increment to get the next event
+		counter = counter + 1
+	}
+
+	if jobStatus != "successful" {
+		return fmt.Errorf("Job %d %s consult ansible tower for more details", jl.ID, jobStatus)
+	}
+
+	o.Output(fmt.Sprintf("Job %d %s", jl.ID, jobStatus))
 
 	return nil
 }
@@ -100,7 +99,7 @@ func checkJobStatus(j *awx.JobService, id int) string {
 	return job.Status
 }
 
-func printEvents(jb *awx.JobService, counter, jobID int) {
+func printEvents(jb *awx.JobService, counter, jobID int, output terraform.UIOutput) {
 	events, _, err := jb.GetJobEvents(jobID, map[string]string{
 		"counter":      strconv.Itoa(counter),
 	})
@@ -112,7 +111,7 @@ func printEvents(jb *awx.JobService, counter, jobID int) {
 		event := events[0]
 
 		if event.Stdout != "" {
-			fmt.Printf("%s\n", event.Stdout)
+			output.Output(fmt.Sprintf("%s\n", event.Stdout))
 		}
 
 	}
