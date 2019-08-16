@@ -8,6 +8,8 @@ This is still a work in progres! Execute Tower/AWX job templates from terraform 
 
 # TODO
 
+- [ ] Test Suites
+
 - [ ] Fix Loop for printing job logs
 
 - [ ] Support passing inventories to job template
