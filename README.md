@@ -1,6 +1,6 @@
 # AWX Provisioner
 
-This is still a work in progres! Execute Tower/AWX job templates from terraform with a provisioner
+This is still a work in progress! Execute Tower/AWX job templates from terraform with a provisioner
 
 # Current Functionality
 
@@ -10,13 +10,13 @@ This is still a work in progres! Execute Tower/AWX job templates from terraform 
 
 - [ ] Test Suites
 
-- [ ] Fix Loop for printing job logs
+- [x] Fix Loop for printing job logs
 
 - [ ] Support passing inventories to job template
 
-- [ ] Support passing custom variables (survey data)
+- [ ] Support passing custom variables
 
-- [ ] Add new features
+- [ ] Feature Requests
 
 # Usage
 
