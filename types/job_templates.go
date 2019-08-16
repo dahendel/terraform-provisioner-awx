@@ -90,20 +90,3 @@ func NewJobTemplateSchemaFromInterface(i interface{}, ok bool) *JobTemplateSetti
 	}
 	return v
 }
-
-//func GetJobTemplate(c *AWXClient, settings interface{}) (*awx.JobTemplate, error) {
-//	opts := settings.(*JobTemplateSettings)
-//	tmplts, _, err := c.Client.JobTemplateService.(nil)
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	for _, t := range tmplts {
-//		if t.Name == opts.TemplateID {
-//			return t, nil
-//		}
-//	}
-//
-//	return nil, fmt.Errorf("unable to find %s template that is ran agains the appropriate inventory id %d", opts.TemplateID, opts.InventoryID)
-//}

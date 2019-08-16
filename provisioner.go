@@ -61,31 +61,19 @@ func applyFn(ctx context.Context) error {
 
 	for jobStatus != "failed" ||  jobStatus != "successful" || jobStatus != "error" || jobStatus != "canceled" {
 		if jobStatus == "pending" {
-			o.Output(fmt.Sprintf("Job %d is pending\n", jl.ID))
+			fmt.Printf("Job %d is pending\n", jl.ID)
 		}
 
 		for jobStatus == "running" {
-			events, _, err := jb.GetJobEvents(jl.ID, map[string]string{
-				"counter":      strconv.Itoa(counter),
-			})
-
-			if err != nil {
-				panic(err)
-			}
-			if len(events) > 0 {
-				event := events[0]
-
-				if event.Stdout != "" {
-					o.Output(fmt.Sprintf("%s\n", event.Stdout))
-				}
-
-			}
+			printEvents(jb, counter, jl.ID)
 			jobStatus = checkJobStatus(jb, jl.ID)
 			if jobStatus != "running" {
-				return nil
+				return fmt.Errorf("Job %d %s consult ansible tower for more details", jl.ID, jobStatus)
 			}
+
 			counter = counter + 1
 		}
+
 		jobStatus = checkJobStatus(jb, jl.ID)
 		time.Sleep(5 * time.Second)
 	}
@@ -110,4 +98,22 @@ func checkJobStatus(j *awx.JobService, id int) string {
 	}
 
 	return job.Status
+}
+
+func printEvents(jb *awx.JobService, counter, jobID int) {
+	events, _, err := jb.GetJobEvents(jobID, map[string]string{
+		"counter":      strconv.Itoa(counter),
+	})
+
+	if err != nil {
+		panic(err)
+	}
+	if len(events) > 0 {
+		event := events[0]
+
+		if event.Stdout != "" {
+			fmt.Printf("%s\n", event.Stdout)
+		}
+
+	}
 }
