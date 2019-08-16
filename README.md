@@ -47,7 +47,7 @@ resource "null_resource" "tower_job" {
     }
 
     job_template {
-      template_id = awx_job_template.install-app.id
+      template_id = awx_job_template.elasticsearch-install.id
     }
   }
 }
