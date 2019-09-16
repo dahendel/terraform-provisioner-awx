@@ -1,4 +1,4 @@
-package types
+package awx
 
 import (
 	"crypto/tls"
@@ -25,20 +25,20 @@ const (
 	awxClientEnvSkipTLSVerify = "TF_AWX_SKIP_TLS_VERIFY"
 )
 
-// AWXClientSettings represents settings to establish a awx api client
-type AWXClientSettings struct {
+// ClientSettings represents settings to establish a awx api client
+type ClientSettings struct {
 	Username string
 	Password string
 	BaseURLString string
 	SkipTLSVerify bool
 }
 
-type AWXClient struct {
+type Client struct {
 	Client *awx.AWX
 	o terraform.UIOutput
 }
 
-// NewAWXClientSchema returns new AWXClientSettings schema
+// NewAWXClientSchema returns new ClientSettings schema
 func NewAWXClientSchema() *schema.Schema{
 	return &schema.Schema{
 		Type:     schema.TypeSet,
@@ -100,8 +100,8 @@ func NewAWXClientSchema() *schema.Schema{
 	}
 }
 
-func NewAWXClientSettingsFromInterface(i interface{}, ok bool) *AWXClientSettings {
-	v := &AWXClientSettings{
+func NewAWXClientSettingsFromInterface(i interface{}, ok bool) *ClientSettings {
+	v := &ClientSettings{
 		BaseURLString: awxDefaultBaseURLString,
 	}
 	if ok {
@@ -115,13 +115,13 @@ func NewAWXClientSettingsFromInterface(i interface{}, ok bool) *AWXClientSetting
 	return v
 }
 
-func NewAWXClient(settings *AWXClientSettings, o terraform.UIOutput) *AWXClient {
+func NewAWXClient(settings *ClientSettings, o terraform.UIOutput) *Client {
 	t := &http.Transport{TLSClientConfig: &tls.Config{
 		InsecureSkipVerify: settings.SkipTLSVerify,
 	}}
 
 	a := awx.NewAWX(settings.BaseURLString, settings.Username, settings.Password, &http.Client{Transport: t})
-	return &AWXClient{
+	return &Client{
 		Client: a,
 		o: o,
 	}

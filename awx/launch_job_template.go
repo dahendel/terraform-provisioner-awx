@@ -1,4 +1,4 @@
-package types
+package awx
 
 type Launch struct {
 	CanStartWithoutUserInput bool            `json:"can_start_without_user_input"`

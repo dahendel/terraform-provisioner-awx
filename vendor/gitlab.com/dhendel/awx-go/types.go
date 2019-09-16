@@ -407,6 +407,19 @@ type JobLaunch struct {
 	VaultCredential         interface{}       `json:"vault_credential"`
 }
 
+type JobLaunchOpts struct {
+	ExtraVars           map[string]interface{} `json:"extra_vars,omitempty"`
+	Inventory           int                    `json:"inventory,omitempty"`
+	Limit               string                 `json:"limit,omitempty"`
+	JobTags             string                 `json:"job_tags,omitempty"`
+	SkipTags            string                 `json:"skip_tags,omitempty"`
+	JobType             string                 `json:"job_type,omitempty"`
+	Verbosity           int                    `json:"verbosity,omitempty"`
+	DiffMode            interface{}            `json:"diff_mode,omitempty"`
+	Credentials         []int                  `json:"credentials,omitempty"`
+	CredentialPasswords []string               `json:"credential_passwords,omitempty"`
+}
+
 // Job represents the awx api job.
 type Job struct {
 	ID                      int               `json:"id"`

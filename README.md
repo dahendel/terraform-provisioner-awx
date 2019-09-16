@@ -5,6 +5,7 @@ This is still a work in progress! Execute Tower/AWX job templates from terraform
 # Current Functionality
 
 - Execute Job template with ID
+- Pass inventory id when a job template prompts on launch
 
 # TODO
 
@@ -12,7 +13,7 @@ This is still a work in progress! Execute Tower/AWX job templates from terraform
 
 - [x] Fix Loop for printing job logs
 
-- [ ] Support passing inventories to job template
+- [x] Support passing inventories to job template
 
 - [ ] Support passing custom variables
 
@@ -37,9 +38,6 @@ resource "awx_job_template" "elasticsearch-install" {
 
 resource "null_resource" "tower_job" {
   depends_on = [module.demo1]
-  //  triggers = {
-  //    ips = "${module.demo1.virtual_machine_default_ips}"
-  //  }
   
   provisioner "awx" {
     awx_settings {
@@ -50,6 +48,7 @@ resource "null_resource" "tower_job" {
 
     job_template {
       template_id = awx_job_template.elasticsearch-install.id
+      inventory_id = awx_inventory.demo.id
     }
   }
 }

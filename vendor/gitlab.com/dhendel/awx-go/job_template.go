@@ -34,7 +34,7 @@ func (jt *JobTemplateService) ListJobTemplates(params map[string]string) ([]*Job
 }
 
 // Launch lauchs a job with the job template.
-func (jt *JobTemplateService) Launch(id int, data map[string]interface{}, params map[string]string) (*JobLaunch, error) {
+func (jt *JobTemplateService) Launch(id int, data *JobLaunchOpts, params map[string]string) (*JobLaunch, error) {
 	result := new(JobLaunch)
 	endpoint := fmt.Sprintf("/api/v2/job_templates/%d/launch/", id)
 	payload, err := json.Marshal(data)
@@ -42,6 +42,7 @@ func (jt *JobTemplateService) Launch(id int, data map[string]interface{}, params
 		return nil, err
 	}
 
+	fmt.Printf("PAYLOAD: %s", string(payload))
 	resp, err := jt.client.Requester.PostJSON(endpoint, bytes.NewReader(payload), result, params)
 	if err != nil {
 		return nil, err
@@ -115,12 +116,29 @@ func (jt *JobTemplateService) DeleteJobTemplate(id int) (*JobTemplate, error) {
 	return result, nil
 }
 
-func (jt *JobTemplateService) AddJobTemplateCredential(id int) (*JobTemplate, error) {
+// GetJobTemplate gets a job template
+func (jt *JobTemplateService) GetJobTemplate(id int) (*JobTemplate, error) {
 	result := new(JobTemplate)
-	endpoint := fmt.Sprintf("/api/v2/job_templates/%d/credentials", id)
+	endpoint := fmt.Sprintf("/api/v2/job_templates/%d", id)
+
+	resp, err := jt.client.Requester.Get(endpoint, result, map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := CheckResponse(resp); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (jt *JobTemplateService) AddJobTemplateCredential(jobTemplateID int, credID int) (*JobTemplate, error) {
+	result := new(JobTemplate)
+	endpoint := fmt.Sprintf("/api/v2/job_templates/%d/credentials/", jobTemplateID)
 
 	payload := map[string]int{
-		"id": id,
+		"id": credID,
 	}
 
 	jsonPayload, err := json.Marshal(payload)

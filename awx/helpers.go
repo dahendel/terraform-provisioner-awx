@@ -1,4 +1,4 @@
-package types
+package awx
 
 func mapFromTypeSet(i interface{}) map[string]interface{} {
 	return i.(map[string]interface{})

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gitlab.com/dhendel/awx-go"
-	"navihealth.us/tf/terraform-provisioner-awx/types"
+	awxp "gitlab.com/dhendel/terraform-provisioner-awx/awx"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"strconv"
@@ -13,16 +13,17 @@ import (
 
 
 type provisioner struct {
-	awxSettings *types.AWXClientSettings
-	awxJobTemplateSettings *types.JobTemplateSettings
+	awxSettings *awxp.ClientSettings
+	awxJobTemplateSettings *awxp.JobTemplateSettings
 }
 
 // Provisioner describes this provisioner configuration.
 func Provisioner() terraform.ResourceProvisioner {
+
 	return &schema.Provisioner{
 		Schema: map[string]*schema.Schema{
-			"awx_settings":  types.NewAWXClientSchema(),
-			"job_template":  types.NewJobTemplateSchema(),
+			"awx_settings": awxp.NewAWXClientSchema(),
+			"job_template": awxp.NewJobTemplateSchema(),
 		},
 		ApplyFunc:    applyFn,
 	}
@@ -39,20 +40,25 @@ func applyFn(ctx context.Context) error {
 		return err
 	}
 
-	awx := types.NewAWXClient(p.awxSettings, o)
+	awxClient := awxp.NewAWXClient(p.awxSettings, o)
 
 
 	if err != nil {
 		return err
 	}
 
-	jl, err := awx.Client.JobTemplateService.Launch(p.awxJobTemplateSettings.TemplateID, map[string]interface{}{}, map[string]string{})
+	launchPayload := &awx.JobLaunchOpts{
+		Inventory: p.awxJobTemplateSettings.InventoryID,
+	}
+
+
+	jl, err := awxClient.Client.JobTemplateService.Launch(p.awxJobTemplateSettings.TemplateID, launchPayload, map[string]string{})
 
 	if err != nil {
 		return err
 	}
 
-	jb := awx.Client.JobService
+	jb := awxClient.Client.JobService
 	var jobStatus string
 	jobStatus = checkJobStatus(jb, jl.ID)
 
@@ -83,8 +89,8 @@ func applyFn(ctx context.Context) error {
 
 func decodeConfig(d *schema.ResourceData) (*provisioner, error) {
 	p := &provisioner{
-		awxSettings: types.NewAWXClientSettingsFromInterface(d.GetOk("awx_settings")),
-		awxJobTemplateSettings: types.NewJobTemplateSchemaFromInterface(d.GetOk("job_template")),
+		awxSettings:            awxp.NewAWXClientSettingsFromInterface(d.GetOk("awx_settings")),
+		awxJobTemplateSettings: awxp.NewJobTemplateSchemaFromInterface(d.GetOk("job_template")),
 	}
 
 	return  p, nil
