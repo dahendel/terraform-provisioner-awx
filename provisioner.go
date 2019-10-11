@@ -51,6 +51,9 @@ func applyFn(ctx context.Context) error {
 		Inventory: p.awxJobTemplateSettings.InventoryID,
 	}
 
+	if len(p.awxJobTemplateSettings.ExtraArgs) > 0 {
+		launchPayload.ExtraVars = p.awxJobTemplateSettings.ExtraArgs
+	}
 
 	jl, err := awxClient.Client.JobTemplateService.Launch(p.awxJobTemplateSettings.TemplateID, launchPayload, map[string]string{})
 
@@ -113,6 +116,7 @@ func printEvents(jb *awx.JobService, counter, jobID int, output terraform.UIOutp
 	if err != nil {
 		panic(err)
 	}
+
 	if len(events) > 0 {
 		event := events[0]
 
