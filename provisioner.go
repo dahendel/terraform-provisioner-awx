@@ -29,7 +29,6 @@ func Provisioner() terraform.ResourceProvisioner {
 	}
 }
 
-
 func applyFn(ctx context.Context) error {
 
 	o := ctx.Value(schema.ProvOutputKey).(terraform.UIOutput)
