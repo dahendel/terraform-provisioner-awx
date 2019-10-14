@@ -122,6 +122,5 @@ func printEvents(jb *awx.JobService, counter, jobID int, output terraform.UIOutp
 		if event.Stdout != "" {
 			output.Output(fmt.Sprintf("%s\n", event.Stdout))
 		}
-
 	}
 }
